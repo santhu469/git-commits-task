@@ -1,23 +1,66 @@
-import logo from './logo.svg';
 import './App.css';
+import CommitsList from './components/CommitsList';
+
+import { Octokit } from "@octokit/core";
+import { useEffect, useState } from 'react';
 
 function App() {
+
+  const [commits, setCommits] = useState([]);
+
+  const [key, setKey] = useState("");
+  const [isKey, setIsKey] = useState(true);
+
+  const appOctokit = new Octokit({
+    auth: key
+  });
+
+  const getCommits = async () => {
+    const { data } = await appOctokit.request("GET /repos/santhu469/git-commits-task/commits", {
+      owner: 'santhu469',
+      repo: 'react-todo'
+    });
+
+    if(data) {
+      setCommits(data);
+    }
+  };
+
+  const keySetup = (e) => {
+    e.preventDefault();
+    if(key === "") {
+      return;
+    }
+    localStorage.setItem("key", JSON.stringify(key));
+    setKey("")
+  };
+
+  useEffect(() => {
+    const storedKey = JSON.parse(localStorage.getItem("key"));
+    if(!storedKey) {
+      setIsKey(true);
+    } else {
+      setIsKey(false);
+    }
+    getCommits();
+  },[]);
+
+  const handleRefresh = () => {
+    getCommits();
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="main">
+      <h1 className='header'>Git commits Task</h1>
+
+      {isKey && <form onSubmit={(e) => keySetup(e)}>
+        <input onChange={(e) => setKey(e.target.value)} value={key} />
+        <button type='submit'>set key</button>
+      </form> }
+      {commits.length > 0 && <div style={{maxWidth: "51%", textAlign: "right", marginBottom: 20}}>
+        <button onClick={handleRefresh}>Refresh</button>
+      </div>}
+      <CommitsList commits={commits} />
     </div>
   );
 }
