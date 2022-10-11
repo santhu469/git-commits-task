@@ -3,10 +3,11 @@ import moment from 'moment';
 import '../App.css';
 
 const CommitsList = ({ commits }) => {
-    console.log()
+    
     if (commits.length === 0) {
         return <div>No commits to display</div>
     }
+    
     return (
         <>
         {commits.map((commit, ind) => (<div key={ind} className="commit-container">

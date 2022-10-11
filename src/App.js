@@ -9,14 +9,22 @@ function App() {
   const [commits, setCommits] = useState([]);
 
   const [key, setKey] = useState("");
+
+  const [user, setuser] = useState({
+    author: "santhu469",
+    repo: "git-commits-task"
+  });
+
   const [isKey, setIsKey] = useState(true);
 
   const appOctokit = new Octokit({
     auth: key
   });
 
+  const  {author, repo} = user;
+
   const getCommits = async () => {
-    const { data } = await appOctokit.request("GET /repos/santhu469/git-commits-task/commits", {
+    const { data } = await appOctokit.request(`GET /repos/${author}/${repo}/commits`, {
       owner: 'santhu469',
       repo: 'react-todo'
     });
